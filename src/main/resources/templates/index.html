@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+    dt {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1> User Info</h1>
+  <dt> Email: </dt>
+  <th:dd th:text="${email}"> </th:dd>
+  <dt> Info do Cliente: </dt>
+  <th:dd th:text="${info}"> </th:dd>
+</body>
+</html>
