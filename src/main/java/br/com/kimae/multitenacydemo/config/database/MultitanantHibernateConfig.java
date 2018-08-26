@@ -1,9 +1,7 @@
-package br.com.kimae.multitenacydemo.config;
+package br.com.kimae.multitenacydemo.config.database;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.cfg.Environment;
@@ -11,7 +9,6 @@ import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.hibernate.dialect.MySQLDialect;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -43,27 +40,24 @@ public class MultitanantHibernateConfig {
     @Autowired
     private DataSourceProperties dataSourceProperties;
 
-    @Bean
     public MultiTenantConnectionProvider multiTenantConnectionProvider() {
         return new DataSourceMulttenantConnectionProvider(dataSourceProperties);
     }
 
-    @Bean
     public CurrentTenantIdentifierResolver currentTenantIdentifierResolver() {
         return new IdentifierResolver();
     }
 
     @Bean(name="multitenantManagerFactoryBean")
-    public LocalContainerEntityManagerFactoryBean multitenantManagerFactoryBean(MultiTenantConnectionProvider multiTenantConnectionProvider,
-        CurrentTenantIdentifierResolver currentTenantIdentifierResolver) {
+    public LocalContainerEntityManagerFactoryBean multitenantManagerFactoryBean( ) {
         Map<String, Object> hibernateProps = new LinkedHashMap<>();
         hibernateProps.putAll(this.jpaProperties.getProperties());
         //hibernateProps.put(Environment.INTERCEPTOR,HibernateInterceptor.class.getName());
         hibernateProps.put(Environment.DIALECT, MySQLDialect.class.getName());
         hibernateProps.put(Environment.PHYSICAL_NAMING_STRATEGY, SpringPhysicalNamingStrategy.class.getName());
         hibernateProps.put(Environment.MULTI_TENANT, MultiTenancyStrategy.DATABASE);
-        hibernateProps.put(Environment.MULTI_TENANT_CONNECTION_PROVIDER, multiTenantConnectionProvider);
-        hibernateProps.put(Environment.MULTI_TENANT_IDENTIFIER_RESOLVER, currentTenantIdentifierResolver);
+        hibernateProps.put(Environment.MULTI_TENANT_CONNECTION_PROVIDER, multiTenantConnectionProvider() );
+        hibernateProps.put(Environment.MULTI_TENANT_IDENTIFIER_RESOLVER, currentTenantIdentifierResolver());
 
         // No dataSource is set to resulting entityManagerFactoryBean
         LocalContainerEntityManagerFactoryBean result = new LocalContainerEntityManagerFactoryBean();
@@ -77,15 +71,10 @@ public class MultitanantHibernateConfig {
         return result;
     }
 
-    @Bean(name="multitenantManagerFactory")
-    public EntityManagerFactory entityManagerFactory(@Qualifier("multitenantManagerFactoryBean") LocalContainerEntityManagerFactoryBean multitenantManagerFactoryBean) {
-        return multitenantManagerFactoryBean.getObject();
-    }
-
     @Bean(name="multitenantTransaction")
-    public PlatformTransactionManager txManager(@Qualifier("multitenantManagerFactory") EntityManagerFactory entityManagerFactory) {
+    public PlatformTransactionManager txManager() {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(entityManagerFactory);
+        transactionManager.setEntityManagerFactory(multitenantManagerFactoryBean().getObject());
         return transactionManager;
     }
 

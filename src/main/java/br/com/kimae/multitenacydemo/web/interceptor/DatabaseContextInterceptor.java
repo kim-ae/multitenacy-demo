@@ -20,7 +20,7 @@ public class DatabaseContextInterceptor {
     public void before(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         AppPrincipal principal = (AppPrincipal) auth.getPrincipal();
-
+        log.debug("Setting tenant for this thread: {}",principal.getClientDatabase());
         DatabaseContext.setTenantId(principal.getClientDatabase());
     }
 }

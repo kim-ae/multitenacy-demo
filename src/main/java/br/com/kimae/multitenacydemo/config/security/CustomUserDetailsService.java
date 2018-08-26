@@ -13,8 +13,10 @@ import org.springframework.stereotype.Service;
 
 import br.com.kimae.multitenacydemo.persistence.app.AppUser;
 import br.com.kimae.multitenacydemo.persistence.app.AppUserRepository;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class CustomUserDetailsService implements UserDetailsService {
 
     private static final String ROLE_USER = "ROLE_USER";
@@ -28,6 +30,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("No user found with username: " + email);
         }
+        log.debug("Trying to logging with {}",email);
         return new AppPrincipal(user.getEmail(), user.getPassword(),  getAuthorities(ROLE_USER), user.getClientDatabase());
     }
 
