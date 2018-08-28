@@ -1,11 +1,11 @@
-package br.com.kimae.multitenacydemo;
+package br.com.kimae.multitenacydemo.config.database;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DatabaseContext {
 
-    private static final ThreadLocal<String> CONTEXT = new ThreadLocal<>();
+    private static final ThreadLocal<String> CONTEXT = new ThreadLocal();
 
     public static String getTenantId() {
         return CONTEXT.get();

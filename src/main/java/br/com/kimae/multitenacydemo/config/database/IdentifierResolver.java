@@ -2,7 +2,6 @@ package br.com.kimae.multitenacydemo.config.database;
 
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 
-import br.com.kimae.multitenacydemo.DatabaseContext;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

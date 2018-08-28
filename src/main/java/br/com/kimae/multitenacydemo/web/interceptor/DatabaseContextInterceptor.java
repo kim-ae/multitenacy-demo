@@ -6,9 +6,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import br.com.kimae.multitenacydemo.DatabaseContext;
+import br.com.kimae.multitenacydemo.config.database.DatabaseContext;
 import br.com.kimae.multitenacydemo.config.security.AppPrincipal;
-import lombok.extern.apachecommons.CommonsLog;
 import lombok.extern.slf4j.Slf4j;
 
 @Aspect

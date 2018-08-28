@@ -32,7 +32,7 @@ import br.com.kimae.multitenacydemo.persistence.multitanant.MultitanantEntityMar
     entityManagerFactoryRef = "multitenantManagerFactoryBean",
     transactionManagerRef = "multitenantTransaction"
 )
-public class MultitanantHibernateConfig {
+public class MultitenantHibernateConfig {
 
     @Autowired
     private JpaProperties jpaProperties;

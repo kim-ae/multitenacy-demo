@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DataSourceMulttenantConnectionProvider extends AbstractDataSourceBasedMultiTenantConnectionProviderImpl {
 
-    private Map<String, DataSource> datasourcesCache = new HashMap<>();
+    private final Map<String, DataSource> datasourcesCache = new HashMap<>();
 
     private final DataSourceProperties dataSourceProperties;
 
