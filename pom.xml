@@ -14,14 +14,17 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.4.RELEASE</version>
+		<version>3.1.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>1.8</java.version>
+		<java.version>20</java.version>
+		<main.class>br.com.kimae.multitenacydemo.MultitenacyDemoApplication</main.class>
+		<dockerfile.name>codebrain.registry.com/test/multitenancydemo</dockerfile.name>
+		<dockerfile.tag>${version}</dockerfile.tag>
 	</properties>
 
 	<dependencies>
@@ -49,6 +52,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.31</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -73,6 +77,33 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>${main.class}</mainClass>
+					<skip>false</skip>
+					<layers>
+						<enabled>true</enabled>
+					</layers>
+				</configuration>
+				<executions>
+					<execution>
+						<id>spring-package</id>
+						<goals>
+							<goal>build-info</goal>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>spring-image</id>
+						<goals>
+							<goal>build-image</goal>
+						</goals>
+						<configuration>
+							<image>
+								<name>${dockerfile.name}:${dockerfile.tag}</name>
+							</image>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

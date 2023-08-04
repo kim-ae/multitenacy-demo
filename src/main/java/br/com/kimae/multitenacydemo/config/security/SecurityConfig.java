@@ -1,69 +1,66 @@
 package br.com.kimae.multitenacydemo.config.security;
 
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 
 import br.com.kimae.multitenacydemo.persistence.app.AppUser;
 import br.com.kimae.multitenacydemo.persistence.app.AppUserRepository;
+import jakarta.annotation.PostConstruct;
 
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+@Configuration
+public class SecurityConfig {
 
-    @Autowired
-    private AppUserRepository appUserRepository;
+	private final AppUserRepository appUserRepository;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+	private final UserDetailsService userDetailsService;
 
-    @PostConstruct
-    private void saveTestUser() {
-        final AppUser user1 = new AppUser();
-        user1.setEmail("email-cliente1@email.com");
-        user1.setPassword("pass");
-        user1.setClientDatabase("cliente1");
-        appUserRepository.save(user1);
+	public SecurityConfig(AppUserRepository appUserRepository, UserDetailsService userDetailsService) {
+		this.appUserRepository = appUserRepository;
+		this.userDetailsService = userDetailsService;
+	}
 
-        final AppUser user2 = new AppUser();
-        user2.setEmail("email-cliente2@email.com");
-        user2.setPassword("pass");
-        user2.setClientDatabase("cliente2");
-        appUserRepository.save(user2);
-    }
+	@PostConstruct
+	private void saveTestUser() {
+		final AppUser user1 = new AppUser();
+		user1.setEmail("email-cliente1@email.com");
+		user1.setPassword("pass");
+		user1.setClientDatabase("cliente1");
+		appUserRepository.save(user1);
 
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        DaoAuthenticationProvider dao = new DaoAuthenticationProvider();
-        dao.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
-        dao.setUserDetailsService(userDetailsService);
-        auth.authenticationProvider(dao);
-    }
+		final AppUser user2 = new AppUser();
+		user2.setEmail("email-cliente2@email.com");
+		user2.setPassword("pass");
+		user2.setClientDatabase("cliente2");
+		appUserRepository.save(user2);
+	}
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-            .antMatchers("/static/**").permitAll()
-            .anyRequest().authenticated()
+	@Bean
+	public DaoAuthenticationProvider authProvider() {
+		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+		authProvider.setUserDetailsService(userDetailsService);
+		authProvider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
+		return authProvider;
+	}
 
-            .and()
-            .formLogin().
-            loginPage("/login").permitAll().
-            loginProcessingUrl("/doLogin")
-
-            .and()
-            .logout().permitAll().logoutUrl("/logout")
-
-            .and()
-            .csrf().disable()
-        ;
-    }
-
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		return http
+				.authorizeHttpRequests(
+						authz -> authz.requestMatchers("/static/**").permitAll().anyRequest().authenticated())
+				.formLogin(form -> form
+						.loginPage("/login")
+						.permitAll()
+						.loginProcessingUrl("/doLogin")
+				)
+				.logout(form -> form.logoutUrl("/logout"))
+				.csrf(csrf -> csrf.disable())
+				.build();
+	}
 }
