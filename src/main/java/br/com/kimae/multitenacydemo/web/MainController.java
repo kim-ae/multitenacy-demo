@@ -13,18 +13,19 @@ import br.com.kimae.multitenacydemo.web.interceptor.DatabaseContextSensitivy;
 @Controller
 public class MainController {
 
-    @Autowired
-    private InfoManagerService infoManagerService;
+	private static final String UNKNOWN_USER_INFO = "UNKNOWN";
+	@Autowired
+	private InfoManagerService infoManagerService;
 
-    @RequestMapping("/")
-    @DatabaseContextSensitivy
-    public ModelAndView index(){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        ModelAndView view = new ModelAndView("index");
+	@RequestMapping("/")
+	@DatabaseContextSensitivy
+	public ModelAndView index() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		ModelAndView view = new ModelAndView("index");
 
-        view.addObject("email", auth.getName());
-        view.addObject("info", infoManagerService.getSensitivyUserInfo(auth.getName()));
-        return view;
-    }
+		view.addObject("email", auth.getName());
+		view.addObject("info", infoManagerService.getSensitivyUserInfo(auth.getName()).orElse(UNKNOWN_USER_INFO));
+		return view;
+	}
 
 }

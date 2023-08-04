@@ -9,4 +9,4 @@ logging:
   level:
     root: WARN
     br.com.kimae.multitenacydemo: DEBUG
-    com.mysql: NONE
+    com.mysql: ERROR
