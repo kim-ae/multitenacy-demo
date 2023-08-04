@@ -15,7 +15,7 @@ public class MainController {
 
 	private static final String UNKNOWN_USER_INFO = "UNKNOWN";
 	@Autowired
-	private InfoManagerService infoManagerService;
+	private InfoManagerService service;
 
 	@RequestMapping("/")
 	@DatabaseContextSensitivy
@@ -24,7 +24,7 @@ public class MainController {
 		ModelAndView view = new ModelAndView("index");
 
 		view.addObject("email", auth.getName());
-		view.addObject("info", infoManagerService.getSensitivyUserInfo(auth.getName()).orElse(UNKNOWN_USER_INFO));
+		view.addObject("info", service.getSensitivyUserInfo(auth.getName()).orElse(UNKNOWN_USER_INFO));
 		return view;
 	}
 

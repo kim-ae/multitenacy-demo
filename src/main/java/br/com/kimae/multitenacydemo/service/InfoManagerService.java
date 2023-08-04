@@ -4,7 +4,6 @@ import static java.util.Optional.ofNullable;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,8 +16,11 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional("multitenantTransaction")
 public class InfoManagerService {
 
-	@Autowired
-	private InfoUserRepository repository;
+	private final InfoUserRepository repository;
+
+	public InfoManagerService(InfoUserRepository repository) {
+		this.repository = repository;
+	}
 
 	public Optional<String> getSensitivyUserInfo(String user) {
 		log.info("Retrieving sensitivy information about {}", user);
